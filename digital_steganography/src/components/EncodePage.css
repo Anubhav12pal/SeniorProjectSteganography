@@ -1,0 +1,72 @@
+/* src/components/EncodePage.css */
+
+.encode-container {
+    padding: 40px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #2c3e50;
+  }
+  
+  .encode-container h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #1abc9c;
+  }
+  
+  .encode-container p {
+    font-size: 18px;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .form-label {
+    font-size: 18px;
+    color: #34495e;
+  }
+  
+  #image-upload {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+  }
+  
+  #message-input {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .encode-btn {
+    padding: 10px 20px;
+    background-color: #1abc9c;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .encode-btn:hover {
+    background-color: #16a085;
+  }
+  
+  .preview {
+    margin: 20px 0;
+  }
+  
+  .preview img {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid #1abc9c;
+    border-radius: 10px;
+  }
+  
