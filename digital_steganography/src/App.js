@@ -7,6 +7,7 @@ import AboutPage from './components/AboutPage.js';
 import EncodePage from './components/EncodePage.js';
 import DecodePage from './components/DecodePage.js';
 import HelpPage from './components/HelpPage.js';
+import LoginPage from './components/Login.js';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/encodedata" element={<EncodePage />} />
           <Route path="/decodedata" element={<DecodePage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
         <Footer />
       </div>
