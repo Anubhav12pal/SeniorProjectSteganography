@@ -16,13 +16,13 @@ class Steganography:
             print("No hidden message found!")
 
 def main():
-    input_image = "Image path"
-    output_image = "oytput image path"
-    message = "Message"
+    input_image = "C:/Users/Dishant Borda/Desktop/Rainier.bmp"
+    output_image = "/Users/Dishant Borda/Desktop/rain.bmp"
+    message = "Digital Steganography involves embedding hidden information within digital media files. Our project aims to create a user-friendly tool using Python and React.js to allow secure data hiding and extraction. This tool will support multiple file formats, incorporate encryption, and provide a seamless experience for end-users."
     
     Steganography.encrypt_message(input_image, output_image, message)
     
-    encoded_image = "/Users/anubhav/Documents/DSA Practice with Python Take u forward/Steganography/Images/encoded.png"
+    encoded_image = "/Users/Dishant Borda/Desktop/rain.bmp"
     Steganography.decrypt_message(encoded_image)
 
 if __name__ == "__main__":
