@@ -6,6 +6,7 @@ const EncodePage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [secretMessage, setSecretMessage] = useState('');
 
+  // Function to handle image upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -13,23 +14,32 @@ const EncodePage = () => {
     }
   };
 
-  const handleMessageChange = (e) => {
-    setSecretMessage(e.target.value);
+  // Function to handle text file upload and read its contents
+  const handleTextFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSecretMessage(event.target.result);
+      };
+      reader.readAsText(file);
+    }
   };
 
+  // Function to handle encoding logic
   const handleEncode = () => {
     if (selectedImage && secretMessage) {
       // Perform the LSB encoding logic here
       alert("Encoding the message...");
     } else {
-      alert("Please select an image and enter a secret message.");
+      alert("Please select an image and upload a text file with a secret message.");
     }
   };
 
   return (
     <div className="encode-container">
       <h1>Encode Data</h1>
-      <p>Select an image and enter the secret message to hide.</p>
+      <p>Select an image and upload a text file to hide the secret message.</p>
 
       <div className="form-group">
         <label htmlFor="image-upload" className="form-label">Select Image:</label>
@@ -44,9 +54,16 @@ const EncodePage = () => {
       )}
 
       <div className="form-group">
-        <label htmlFor="message-input" className="form-label">Enter Secret Message:</label>
-        <textarea id="message-input" value={secretMessage} onChange={handleMessageChange} placeholder="Enter your message here..." />
+        <label htmlFor="text-upload" className="form-label">Upload Text File:</label>
+        <input type="file" id="text-upload" accept=".txt" onChange={handleTextFileChange} />
       </div>
+
+      {secretMessage && (
+        <div className="message-preview">
+          <h3>Text Preview:</h3>
+          <textarea value={secretMessage} readOnly />
+        </div>
+      )}
 
       <button onClick={handleEncode} className="encode-btn">Encode Message</button>
     </div>

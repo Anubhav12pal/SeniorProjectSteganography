@@ -8,6 +8,8 @@ import EncodePage from './components/EncodePage.js';
 import DecodePage from './components/DecodePage.js';
 import HelpPage from './components/HelpPage.js';
 import LoginPage from './components/Login.js';
+import ForgotPassword from './components/ForgotPassword.js';
+import CreateAccount from './components/CreateAccount.js';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
           <Route path="/decodedata" element={<DecodePage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
         <Footer />
       </div>
