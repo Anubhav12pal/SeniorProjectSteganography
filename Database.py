@@ -9,8 +9,8 @@ class Database:
         self.host = host
         self.dbname = dbname
 
-    # Save user name and hashed password to database
-    def saveCredentials(self, username, password):
+    # Save user name, full name, and hashed password to database
+    def saveCredentials(self, username, full_name, password):
         try:
             # Connect to the database
             connection = psycopg2.connect(
@@ -32,8 +32,8 @@ class Database:
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
             # Insert credentials into the database
-            insert_query = sql.SQL("INSERT INTO users (username, password) VALUES (%s, %s)")
-            cursor.execute(insert_query, (username, hashed_password))
+            insert_query = sql.SQL("INSERT INTO users (username, full_name, password) VALUES (%s, %s, %s)")
+            cursor.execute(insert_query, (username, full_name, hashed_password))
             
             # Commit the transaction
             connection.commit()

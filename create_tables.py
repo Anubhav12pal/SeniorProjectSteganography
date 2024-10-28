@@ -19,11 +19,12 @@ def create_tables():
         )
         cursor = connection.cursor()
         
-        # Create users table
+        # Create users table with full_name column
         create_users_table_query = """
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username VARCHAR(255) UNIQUE NOT NULL,
+            full_name VARCHAR(255) NOT NULL,
             password TEXT NOT NULL
         )
         """
