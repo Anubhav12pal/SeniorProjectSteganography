@@ -1,9 +1,30 @@
 from encryption import Steganography
+import matplotlib.pyplot as plt
 
 class SteganographyProcessor:
     def __init__(self):
         self.input_image = 'images/inputImage.png'
         self.encoded_images_path = 'images/EncodedImages/'
+    
+    
+
+    def plot_metrics(self, sizes, mses, psnrs):
+        plt.figure(figsize=(12, 6))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(sizes, mses, marker='o')
+        plt.title('MSE vs Message Size')
+        plt.xlabel('Message Size (characters)')
+        plt.ylabel('MSE')
+
+        plt.subplot(1, 2, 2)
+        plt.plot(sizes, psnrs, marker='o')
+        plt.title('PSNR vs Message Size')
+        plt.xlabel('Message Size (characters)')
+        plt.ylabel('PSNR')
+
+        plt.tight_layout()
+        plt.show()
 
     def countChars(self):
         char_counts = []
@@ -47,6 +68,7 @@ class SteganographyProcessor:
 
 def main():
     processor = SteganographyProcessor()
+    # processor.create_encoded()
     mses = processor.store_mse()
     psnrs = processor.store_psnr()
     size = processor.countChars()
@@ -54,6 +76,8 @@ def main():
     print(mses)
     print(psnrs)
     print(size)
+
+    processor.plot_metrics(size, mses, psnrs)
     
 
 if __name__ == "__main__":
@@ -66,3 +90,4 @@ if __name__ == "__main__":
 
     
 
+    
