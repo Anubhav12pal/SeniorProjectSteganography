@@ -6,7 +6,7 @@ import logging
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000/"], "supports_credentials": True}})  # Enable CORS for all routes
 
 # Initialize the database connection
 user = os.getenv("DB2_USER")

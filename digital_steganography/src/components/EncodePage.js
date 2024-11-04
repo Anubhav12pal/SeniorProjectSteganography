@@ -1,4 +1,3 @@
-// src/components/EncodePage.js
 import React, { useState } from 'react';
 import './EncodePage.css';
 
@@ -10,7 +9,7 @@ const EncodePage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      setSelectedImage(file);
     }
   };
 
@@ -27,12 +26,32 @@ const EncodePage = () => {
   };
 
   // Function to handle encoding logic
-  const handleEncode = () => {
+  const handleEncode = async () => {
     if (selectedImage && secretMessage) {
-      // Perform the LSB encoding logic here
-      alert("Encoding the message...");
+      // Prepare the form data to send to the backend
+      const formData = new FormData();
+      formData.append('image', selectedImage); // Attach the image file
+      formData.append('secret_message', secretMessage); // Attach the secret message
+
+      try {
+        // Send the form data to the backend
+        const response = await fetch("http://127.0.0.1:5000/api/encode", {
+          method: "POST",
+          body: formData // Pass FormData directly without headers
+        });
+
+        if (response.ok) {
+          alert('Message successfully encoded in the image.');
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Encoding error:', error);
+        alert('An error occurred. Please try again.');
+      }
     } else {
-      alert("Please select an image and upload a text file with a secret message.");
+      alert('Please select an image and upload a text file with a secret message.');
     }
   };
 
@@ -49,7 +68,7 @@ const EncodePage = () => {
       {selectedImage && (
         <div className="preview">
           <h3>Image Preview:</h3>
-          <img src={selectedImage} alt="Selected" />
+          <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
         </div>
       )}
 
