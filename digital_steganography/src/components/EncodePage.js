@@ -28,20 +28,25 @@ const EncodePage = () => {
   // Function to handle encoding logic
   const handleEncode = async () => {
     if (selectedImage && secretMessage) {
-      // Prepare the form data to send to the backend
       const formData = new FormData();
       formData.append('image', selectedImage); // Attach the image file
-      formData.append('secret_message', secretMessage); // Attach the secret message
+      formData.append('secret_message', secretMessage); // Attach the secret message as plain text
 
       try {
-        // Send the form data to the backend
         const response = await fetch("http://127.0.0.1:5000/api/encode", {
           method: "POST",
-          body: formData // Pass FormData directly without headers
+          body: formData
         });
 
         if (response.ok) {
+          const data = await response.json();
           alert('Message successfully encoded in the image.');
+
+          // Download the encoded image
+          const link = document.createElement('a');
+          link.href = `http://127.0.0.1:5000/${data.encoded_image_path}`;
+          link.download = 'encoded_image.png';
+          link.click();
         } else {
           const errorData = await response.json();
           alert(`Error: ${errorData.error}`);

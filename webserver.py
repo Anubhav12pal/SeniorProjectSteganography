@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from encryption import Steganography
 from Database import Database
@@ -6,7 +6,7 @@ import logging
 import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000/"], "supports_credentials": True}})  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
 
 # Initialize the database connection
 user = os.getenv("DB2_USER")
@@ -45,22 +45,33 @@ def login():
 
 @app.route('/api/encode', methods=['POST'])
 def encode():
-    data = request.json
-    input_image_path = data['input_image_path']
-    output_image_path = data['output_image_path']
-    secret_message = data['secret_message']
-    
+    if 'image' not in request.files or 'secret_message' not in request.form:
+        return jsonify({'error': 'Image file and secret message are required'}), 400
+
+    image_file = request.files['image']
+    secret_message = request.form['secret_message']
+
+    os.makedirs('temp', exist_ok=True)  # Ensure the temp directory exists
+    input_image_path = f'temp/{image_file.filename}'
+    image_file.save(input_image_path)
+
+    output_image_path = 'encoded_image.png'
+
     try:
         Steganography.encrypt_message(input_image_path, output_image_path, secret_message)
-        return jsonify({'message': 'Message hidden and saved in image'}), 200
+        return jsonify({'message': 'Message hidden and saved in image', 'encoded_image_path': output_image_path}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/encoded_image.png')
+def get_encoded_image():
+    return send_from_directory('.', 'encoded_image.png', as_attachment=True)
 
 @app.route('/api/decode', methods=['POST'])
 def decode():
     data = request.json
     encoded_image_path = data['encoded_image_path']
-    
+
     try:
         secret_message = Steganography.decrypt_message(encoded_image_path)
         return jsonify({'secret_message': secret_message}), 200
@@ -73,7 +84,7 @@ def save_image():
     username = data['username']
     image_name = data['image_name']
     image_data = data['image_data']  # Assuming image_data is base64 encoded
-    
+
     try:
         db.saveImage(username, image_name, image_data)
         return jsonify({'message': 'Image saved successfully'}), 200
@@ -85,7 +96,7 @@ def retrieve_image():
     data = request.json
     username = data['username']
     image_name = data['image_name']
-    
+
     try:
         image_data = db.retrieveImage(username, image_name)
         if image_data:
