@@ -5,6 +5,56 @@ import math
 
 class Steganography:
     @staticmethod
+    def encrypt_message_2(input_image_path, output_image_path, secret_message):
+        image = Image.open(input_image_path)
+        image = image.convert('RGB')
+        pixels = np.array(image)
+
+        # Convert the message to binary
+        binary_message = ''.join([format(ord(char), '08b') for char in secret_message])
+        binary_message += '1111111111111110'  # Delimiter to mark the end of the message
+
+        data_index = 0
+        message_length = len(binary_message)
+
+        for row in pixels:
+            for pixel in row:
+                for color in range(3):  # Iterate over R, G, B channels
+                    if data_index < message_length:
+                        # Modify the last 2 bits of the pixel
+                        pixel[color] = (pixel[color] & ~3) | int(binary_message[data_index:data_index+2], 2)
+                        data_index += 2
+
+        encoded_image = Image.fromarray(pixels)
+        encoded_image.save(output_image_path)
+        print(f"Message hidden and saved in {output_image_path}")
+
+    @staticmethod
+    def decrypt_message_2(encoded_image_path):
+        image = Image.open(encoded_image_path)
+        image = image.convert('RGB')
+        pixels = np.array(image)
+
+        binary_message = ''
+        for row in pixels:
+            for pixel in row:
+                for color in range(3):  # Iterate over R, G, B channels
+                    binary_message += format(pixel[color] & 3, '02b')
+
+        # Split the binary message into 8-bit chunks and convert to characters
+        message = ''
+        for i in range(0, len(binary_message), 8):
+            byte = binary_message[i:i+8]
+            if byte == '11111110':  # Delimiter to mark the end of the message
+                break
+            message += chr(int(byte, 2))
+
+        if message:
+            print(f"Hidden message: {message}")
+        else:
+            print("No hidden message found!")
+
+    @staticmethod
     def encrypt_message(input_image_path, output_image_path, secret_message):
         encoded_image = lsb.hide(input_image_path, secret_message)
         
@@ -45,35 +95,42 @@ class Steganography:
     def calculate_max_message_size(image_path):
         image = Image.open(image_path)
         width, height = image.size
-        # Assuming 3 color channels (RGB) and 1 bit per channel
-        max_message_size = (width * height * 3) // 8  # in bytes
+        # Assuming 3 color channels (RGB) and 2 bits per channel
+        max_message_size = (width * height * 3 * 2) // 8  # in bytes
         return max_message_size - 10  # Reduce the size slightly to ensure it fits within the allowable limits
 
 def main():
-    input_image = "C:/Users/gpand/Downloads/image metadata/Rainier.bmp"
-    output_image = "C:/Users/gpand/Downloads/image metadata/encoded_image.png"
-    max_size = Steganography.calculate_max_message_size(input_image)
-    print(f"Maximum message size for the image is: {max_size} bytes")
-    
-    # Reduce the message size slightly to ensure it fits within the allowable limits
-    message = "H" * (max_size - 10)  # Example message length that fits within max_size
-    
-    if len(message) > max_size:
-        raise ValueError(f"The message you want to hide is too long: {len(message)}. Maximum allowed size is {max_size} bytes.")
-    
-    # Encrypt the message into the image
+    input_image = "Images/PNG_Image/Lenstarg.png"
+    output_image = "Images/outputImg/out.png"
+    input_image2 = "Images/PNG_Image/Lenstarg.png"
+    output_image2 = "Images/outputImg/out2.png"
+
+    message = "H" * 10000  # Example message length that fits within max_size
+
+    # Encrypt the message into the image using 1-bit LSB
     Steganography.encrypt_message(input_image, output_image, message)
-    
-    # Decrypt the message from the encoded image
-    encoded_image = "C:/Users/gpand/Downloads/image metadata/encoded_image.png"
+    # Encrypt the message into the image using 2-bit LSB
+    Steganography.encrypt_message_2(input_image2, output_image2, message)
+
+    encoded_image = "Images/outputImg/out.png"
+    encoded_image2 = "Images/outputImg/out2.png"
+
+    # Decrypt the message from the encoded images
     Steganography.decrypt_message(encoded_image)
+    Steganography.decrypt_message_2(encoded_image2)
     
     # Calculate MSE and PSNR between the original and encoded images
     mse_encoded = Steganography.calculate_mse(input_image, encoded_image)
     psnr_encoded = Steganography.calculate_psnr(input_image, encoded_image)
+
+    mse_encoded2 = Steganography.calculate_mse(input_image, encoded_image2)
+    psnr_encoded2 = Steganography.calculate_psnr(input_image, encoded_image2)
     
-    print(f"MSE between original and encoded image: {mse_encoded}")
-    print(f"PSNR between original and encoded image: {psnr_encoded}")
+    print(f"MSE between original and 1-bit encoded image: {mse_encoded}")
+    print(f"PSNR between original and 1-bit encoded image: {psnr_encoded}")
+
+    print(f"MSE between original and 2-bit encoded image: {mse_encoded2}")
+    print(f"PSNR between original and 2-bit encoded image: {psnr_encoded2}")
 
 if __name__ == "__main__":
     main()
