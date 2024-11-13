@@ -69,14 +69,42 @@ def get_encoded_image():
 
 @app.route('/api/decode', methods=['POST'])
 def decode():
-    data = request.json
-    encoded_image_path = data['encoded_image_path']
+    if 'image' not in request.files:
+        return jsonify({'error': 'Image file is required'}), 400
+
+    image_file = request.files['image']
+
+    # Save the uploaded image temporarily
+    os.makedirs('temp', exist_ok=True)
+    input_image_path = f'temp/{image_file.filename}'
+    image_file.save(input_image_path)
 
     try:
-        secret_message = Steganography.decrypt_message(encoded_image_path)
-        return jsonify({'secret_message': secret_message}), 200
+        # Decode the hidden message
+        secret_message = Steganography.decrypt_message(input_image_path)
+        logging.debug(f"Decoded message (raw): {repr(secret_message)}")  # Log as repr to see exact value
+
+        if not secret_message:
+            # Handle case where no message is found in the image
+            logging.warning("No hidden message found.")
+            return jsonify({'error': 'No hidden message found in the image.'}), 400
+
+        # Save the decoded message to a text file
+        output_text_path = 'temp/decoded_message.txt'
+        with open(output_text_path, 'w') as file:
+            file.write(secret_message)
+
+        return jsonify({
+            'secret_message': secret_message,
+            'output_text_path': output_text_path
+        }), 200
     except Exception as e:
+        logging.error(f"Error during decoding: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/temp/<filename>')
+def get_temp_file(filename):
+    return send_from_directory('temp', filename, as_attachment=True)
 
 @app.route('/api/save-image', methods=['POST'])
 def save_image():
