@@ -9,18 +9,37 @@ const DecodePage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      setSelectedImage(file); // Save the selected file
     }
   };
 
-  const handleDecode = () => {
-    if (selectedImage) {
-      // LSB decoding logic here
-      setDecodedMessage("This is a decoded message!"); // Placeholder for the decoded message
-    } else {
-      alert("Please select an image to decode.");
+  const handleDecode = async () => {
+  if (selectedImage) {
+    const formData = new FormData();
+    formData.append('image', selectedImage);
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/decode", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDecodedMessage(data.secret_message); // Display the decoded message
+        console.log(`Decoded message saved at: ${data.output_text_path}`);
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`); // Show error messages returned by the backend
+      }
+    } catch (error) {
+      console.error("Decoding error:", error);
+      alert("An error occurred. Please try again.");
     }
-  };
+  } else {
+    alert("Please select an image to decode.");
+  }
+};
 
   return (
     <div className="decode-container">
@@ -35,7 +54,7 @@ const DecodePage = () => {
       {selectedImage && (
         <div className="preview">
           <h3>Image Preview:</h3>
-          <img src={selectedImage} alt="Selected" />
+          <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
         </div>
       )}
 
@@ -45,6 +64,12 @@ const DecodePage = () => {
         <div className="decoded-message">
           <h3>Decoded Message:</h3>
           <p>{decodedMessage}</p>
+          <a
+            href="http://127.0.0.1:5000/temp/decoded_message.txt"
+            download="decoded_message.txt"
+          >
+            Download Decoded Message
+          </a>
         </div>
       )}
     </div>
