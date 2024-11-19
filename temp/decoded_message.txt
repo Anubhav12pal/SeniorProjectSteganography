@@ -1,2 +1,7 @@
-Humpty Dumpty sat on a wall,
-Humpty Dumpty had a great fall.
+file_path = '/Users/anubhav/Desktop/Projects-Personal/SeniorProjectSteganography/TextFiles/f3.txt'
+
+with open(file_path, 'r') as file:
+    content = file.read()
+    num_characters = len(content)
+
+print(f'The file has {num_characters} characters.')
